@@ -1,751 +1,125 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Audio con Pausas</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>">
-    <style>
-        :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #6b8cbc;
-            --accent-color: #ff7e5f;
-            --light-color: #f5f7fa;
-            --dark-color: #333;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
-            padding: 30px;
-        }
-        
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2.2rem;
-        }
-        
-        .description {
-            text-align: center;
-            color: var(--dark-color);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        .api-key-section {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .api-key-section label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-        
-        .api-key-input {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .api-key-input input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        
-        .api-key-input button {
-            padding: 10px 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .input-group {
-            margin-bottom: 25px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-        
-        textarea {
-            width: 100%;
-            height: 200px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            resize: vertical;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .control-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        
-        .buttons {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-generate {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .btn-generate:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        .btn-download {
-            background-color: var(--success-color);
-            color: white;
-        }
-        
-        .btn-download:hover {
-            background-color: #218838;
-        }
-        
-        .btn-download:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .status {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            text-align: center;
-            font-weight: 500;
-        }
-        
-        .status-processing {
-            background-color: #e7f3ff;
-            color: var(--primary-color);
-        }
-        
-        .status-ready {
-            background-color: #e8f5e8;
-            color: var(--success-color);
-        }
-        
-        .status-error {
-            background-color: #fde8e8;
-            color: var(--error-color);
-        }
-        
-        .preview {
-            margin-top: 25px;
-        }
-        
-        .preview h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-        
-        .audio-preview {
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .example {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .example h4 {
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-        
-        .example p {
-            font-family: monospace;
-            background-color: #e9ecef;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--primary-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
-        .progress {
-            width: 100%;
-            height: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background-color: var(--primary-color);
-            width: 0%;
-            transition: width 0.3s;
-        }
-        
-        .github-info {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border-left: 4px solid #28a745;
-        }
-        
-        .github-info h4 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .controls {
-                flex-direction: column;
-            }
-            
-            .buttons {
-                flex-direction: column;
-            }
-            
-            .api-key-input {
-                flex-direction: column;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Audio Pro Interactivo</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+    color: #fff;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+h1 { font-size: 2.2rem; margin-bottom: 10px; text-shadow: 1px 1px 5px #000; }
+textarea { width: 80%; height: 150px; margin-bottom: 10px; padding: 10px; font-size: 16px; border-radius: 8px; border: none; outline: none; }
+select, input[type="range"], button { padding: 10px; margin: 5px; font-size: 16px; border-radius: 8px; border: none; outline: none; }
+button { cursor: pointer; background-color: #FF6B6B; color: #fff; transition: 0.3s; }
+button:hover { background-color: #FF3B3B; }
+label { margin-right: 10px; font-weight: bold; }
+.range-container, .progress-container { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; gap: 10px; }
+#progressBar { width: 300px; height: 20px; background: #fff; border-radius: 10px; overflow: hidden; }
+#progress { height: 100%; width: 0%; background: #FF3B3B; transition: width 0.1s; }
+.button-container { display: flex; gap: 20px; margin-top: 10px; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎙️ Generador de Audio con Pausas</h1>
-        
-        <div class="description">
-            <p>Escribe tu texto y añade pausas personalizadas usando <code>{{pause:3000}}</code> donde 3000 representa los milisegundos de pausa.</p>
-        </div>
-        
-        <div class="api-key-section">
-            <label for="api-key">API Key de ElevenLabs:</label>
-            <div class="api-key-input">
-                <input type="password" id="api-key" placeholder="Ingresa tu API Key aquí">
-                <button id="save-api-key">Guardar</button>
-            </div>
-            <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
-                Necesitas una API Key de <a href="https://elevenlabs.io" target="_blank">ElevenLabs</a> para usar esta herramienta.
-                Tu API Key se guarda localmente en tu navegador y no se envía a ningún servidor.
-            </p>
-        </div>
-        
-        <div class="input-group">
-            <label for="text-input">Texto con pausas:</label>
-            <textarea id="text-input" placeholder="Escribe tu texto aquí. Ejemplo: Hola, esto es una prueba.{{pause:2000}} Ahora continuamos después de 2 segundos de pausa.">Hola, bienvenido a esta demostración.{{pause:2000}} Ahora continuamos después de una pausa de 2 segundos.{{pause:1000}} ¡Perfecto!</textarea>
-        </div>
-        
-        <div class="controls">
-            <div class="control-group">
-                <label for="voice-select">Voz:</label>
-                <select id="voice-select">
-                    <option value="Rachel">Rachel (Femenina, clara)</option>
-                    <option value="Domi">Domi (Femenina, energética)</option>
-                    <option value="Bella">Bella (Femenina, suave)</option>
-                    <option value="Antoni">Antoni (Masculina, amigable)</option>
-                    <option value="Elli">Elli (Femenina, joven)</option>
-                    <option value="Josh">Josh (Masculina, profunda)</option>
-                    <option value="Arnold">Arnold (Masculina, única)</option>
-                    <option value="Adam">Adam (Masculina, profesional)</option>
-                    <option value="Sam">Sam (Masculina, versátil)</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="model-select">Modelo:</label>
-                <select id="model-select">
-                    <option value="eleven_multilingual_v2">Multilingual v2 (Recomendado)</option>
-                    <option value="eleven_turbo_v2">Turbo v2 (Rápido)</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="stability">Estabilidad:</label>
-                <input type="range" id="stability" min="0" max="1" step="0.1" value="0.5">
-                <span id="stability-value">0.5</span>
-            </div>
-            
-            <div class="control-group">
-                <label for="speed-input">Velocidad:</label>
-                <input type="range" id="speed-input" min="0.5" max="2" step="0.1" value="1">
-                <span id="speed-value">1.0x</span>
-            </div>
-        </div>
-        
-        <div class="buttons">
-            <button id="generate-btn" class="btn-generate">Generar Audio</button>
-            <button id="download-btn" class="btn-download" disabled>Descargar MP3</button>
-        </div>
-        
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Generando audio, por favor espera...</p>
-            <div class="progress">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            <p id="progress-text">Procesando segmentos...</p>
-        </div>
-        
-        <div id="status" class="status"></div>
-        
-        <div class="preview">
-            <h3>Vista previa del audio:</h3>
-            <audio id="audio-preview" class="audio-preview" controls></audio>
-        </div>
-        
-        <div class="example">
-            <h4>Ejemplo de uso:</h4>
-            <p>Hola, este es un ejemplo.{{pause:1500}} Después de esta pausa de 1.5 segundos continuamos.{{pause:3000}} Y ahora una pausa de 3 segundos.</p>
-        </div>
+<h1>Generador de Audio Pro Interactivo</h1>
+<p>Escribe tu texto y usa <strong>[PAUSA]</strong> donde quieras la pausa de 5 segundos.</p>
+<textarea id="textInput" placeholder="Escribe tu texto aquí..."></textarea><br>
 
-        <div class="github-info">
-            <h4>📝 Para usar en GitHub Pages:</h4>
-            <p>Esta página está optimizada para GitHub Pages. Solo guarda este archivo como <code>index.html</code> en tu repositorio y activa GitHub Pages en la configuración.</p>
-        </div>
-    </div>
+<select id="voiceSelect"></select><br>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const apiKeyInput = document.getElementById('api-key');
-            const saveApiKeyBtn = document.getElementById('save-api-key');
-            const textInput = document.getElementById('text-input');
-            const voiceSelect = document.getElementById('voice-select');
-            const modelSelect = document.getElementById('model-select');
-            const speedInput = document.getElementById('speed-input');
-            const speedValue = document.getElementById('speed-value');
-            const stabilityInput = document.getElementById('stability');
-            const stabilityValue = document.getElementById('stability-value');
-            const generateBtn = document.getElementById('generate-btn');
-            const downloadBtn = document.getElementById('download-btn');
-            const statusDiv = document.getElementById('status');
-            const audioPreview = document.getElementById('audio-preview');
-            const loadingDiv = document.getElementById('loading');
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-            
-            let audioBlob = null;
-            let apiKey = localStorage.getItem('elevenlabs-api-key');
-            
-            // Cargar API Key guardada
-            if (apiKey) {
-                apiKeyInput.value = apiKey;
-            }
-            
-            // Guardar API Key
-            saveApiKeyBtn.addEventListener('click', function() {
-                apiKey = apiKeyInput.value.trim();
-                if (apiKey) {
-                    localStorage.setItem('elevenlabs-api-key', apiKey);
-                    showStatus('API Key guardada correctamente.', 'ready');
-                } else {
-                    showStatus('Por favor, ingresa una API Key válida.', 'error');
-                }
-            });
-            
-            // Actualizar valores de controles
-            speedInput.addEventListener('input', function() {
-                speedValue.textContent = `${this.value}x`;
-            });
-            
-            stabilityInput.addEventListener('input', function() {
-                stabilityValue.textContent = this.value;
-            });
-            
-            // Generar audio
-            generateBtn.addEventListener('click', generateAudio);
-            
-            // Descargar audio
-            downloadBtn.addEventListener('click', function() {
-                if (audioBlob) {
-                    const url = URL.createObjectURL(audioBlob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'audio-con-pausas.mp3';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }
-            });
-            
-            async function generateAudio() {
-                const text = textInput.value.trim();
-                if (!text) {
-                    showStatus('Por favor, ingresa algún texto.', 'error');
-                    return;
-                }
-                
-                if (!apiKey) {
-                    showStatus('Por favor, ingresa y guarda tu API Key de ElevenLabs.', 'error');
-                    return;
-                }
-                
-                showLoading(true);
-                showStatus('Procesando texto y generando audio...', 'processing');
-                downloadBtn.disabled = true;
-                
-                try {
-                    // Parsear el texto para identificar pausas
-                    const segments = parseTextWithPauses(text);
-                    
-                    // Generar audio con pausas
-                    audioBlob = await generateAudioWithPauses(segments);
-                    
-                    // Actualizar vista previa
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    audioPreview.src = audioUrl;
-                    
-                    showStatus('¡Audio generado con éxito! Ya puedes reproducirlo o descargarlo.', 'ready');
-                    downloadBtn.disabled = false;
-                } catch (error) {
-                    console.error('Error generando audio:', error);
-                    showStatus(`Error al generar el audio: ${error.message}`, 'error');
-                } finally {
-                    showLoading(false);
-                }
-            }
-            
-            function parseTextWithPauses(text) {
-                // Expresión regular para encontrar {{pause:XXXX}}
-                const pauseRegex = /{{pause:(\d+)}}/g;
-                const segments = [];
-                let lastIndex = 0;
-                let match;
-                
-                while ((match = pauseRegex.exec(text)) !== null) {
-                    // Texto antes de la pausa
-                    if (match.index > lastIndex) {
-                        segments.push({
-                            type: 'text',
-                            content: text.substring(lastIndex, match.index)
-                        });
-                    }
-                    
-                    // Pausa
-                    const pauseDuration = parseInt(match[1]);
-                    segments.push({
-                        type: 'pause',
-                        duration: pauseDuration
-                    });
-                    
-                    lastIndex = match.index + match[0].length;
-                }
-                
-                // Texto después de la última pausa
-                if (lastIndex < text.length) {
-                    segments.push({
-                        type: 'text',
-                        content: text.substring(lastIndex)
-                    });
-                }
-                
-                return segments;
-            }
-            
-            async function generateAudioWithPauses(segments) {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const audioBuffers = [];
-                
-                // Procesar cada segmento
-                for (let i = 0; i < segments.length; i++) {
-                    const segment = segments[i];
-                    
-                    if (segment.type === 'text' && segment.content.trim()) {
-                        updateProgress(i, segments.length, `Generando audio para: "${segment.content.substring(0, 30)}..."`);
-                        
-                        // Generar audio para este segmento de texto
-                        const audioBlob = await generateSegmentAudio(segment.content);
-                        const arrayBuffer = await audioBlob.arrayBuffer();
-                        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                        audioBuffers.push(audioBuffer);
-                    } else if (segment.type === 'pause') {
-                        // Crear un buffer de silencio para la pausa
-                        const silenceDuration = segment.duration / 1000; // Convertir a segundos
-                        const sampleRate = audioContext.sampleRate;
-                        const frameCount = sampleRate * silenceDuration;
-                        
-                        const silenceBuffer = audioContext.createBuffer(1, frameCount, sampleRate);
-                        const channelData = silenceBuffer.getChannelData(0);
-                        
-                        // Llenar con ceros (silencio)
-                        for (let j = 0; j < frameCount; j++) {
-                            channelData[j] = 0;
-                        }
-                        
-                        audioBuffers.push(silenceBuffer);
-                    }
-                }
-                
-                updateProgress(segments.length, segments.length, 'Combinando segmentos...');
-                
-                // Combinar todos los buffers de audio
-                const combinedBuffer = combineAudioBuffers(audioBuffers, audioContext);
-                
-                // Convertir a WAV
-                return bufferToWav(combinedBuffer);
-            }
-            
-            async function generateSegmentAudio(text) {
-                const voice = voiceSelect.value;
-                const model = modelSelect.value;
-                const stability = parseFloat(stabilityInput.value);
-                
-                // Preparar el cuerpo de la solicitud
-                const requestBody = {
-                    text: text,
-                    model_id: model,
-                    voice_settings: {
-                        stability: stability,
-                        similarity_boost: 0.75
-                    }
-                };
-                
-                // Solo agregar style y use_speaker_boost si el modelo lo soporta
-                if (model !== 'eleven_turbo_v2') {
-                    requestBody.voice_settings.style = 0.0;
-                    requestBody.voice_settings.use_speaker_boost = true;
-                }
-                
-                // Llamar a la API de ElevenLabs
-                const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + getVoiceId(voice), {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'audio/mpeg',
-                        'Content-Type': 'application/json',
-                        'xi-api-key': apiKey
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    let errorMessage = `Error de API: ${response.status}`;
-                    
-                    try {
-                        const errorData = JSON.parse(errorText);
-                        errorMessage = errorData.detail?.message || errorData.detail || errorMessage;
-                    } catch (e) {
-                        errorMessage = errorText || errorMessage;
-                    }
-                    
-                    throw new Error(errorMessage);
-                }
-                
-                return await response.blob();
-            }
-            
-            function combineAudioBuffers(buffers, audioContext) {
-                // Calcular la longitud total
-                let totalLength = 0;
-                for (const buffer of buffers) {
-                    totalLength += buffer.length;
-                }
-                
-                // Crear un buffer combinado
-                const combinedBuffer = audioContext.createBuffer(
-                    1, // Mono
-                    totalLength,
-                    audioContext.sampleRate
-                );
-                
-                // Copiar datos de cada buffer
-                let offset = 0;
-                const combinedData = combinedBuffer.getChannelData(0);
-                
-                for (const buffer of buffers) {
-                    const bufferData = buffer.getChannelData(0);
-                    for (let i = 0; i < buffer.length; i++) {
-                        combinedData[offset + i] = bufferData[i];
-                    }
-                    offset += buffer.length;
-                }
-                
-                return combinedBuffer;
-            }
-            
-            function getVoiceId(voiceName) {
-                // Mapeo de nombres de voces a sus IDs en ElevenLabs (actualizado)
-                const voiceMap = {
-                    'Rachel': '21m00Tcm4TlvDq8ikWAM',
-                    'Domi': 'AZnzlk1XvdvUeBnXmlld',
-                    'Bella': 'EXAVITQu4vr4xnvxZL8Z',
-                    'Antoni': 'ErXwobaYiN019PkySvjV',
-                    'Elli': 'MF3mGyEYCl7XYWbV9V6O',
-                    'Josh': 'TxGEqnHWrfWFTfGW9XjX',
-                    'Arnold': 'VR6AewLTigWG4xSOukaG',
-                    'Adam': 'pNInz6obpgDQGcFmaJgB',
-                    'Sam': 'yoZ06aMxZJJ28mfd3POQ'
-                };
-                
-                return voiceMap[voiceName] || voiceMap['Rachel'];
-            }
-            
-            function bufferToWav(buffer) {
-                const length = buffer.length;
-                const sampleRate = buffer.sampleRate;
-                const numChannels = buffer.numberOfChannels;
-                
-                const wavBuffer = new ArrayBuffer(44 + length * numChannels * 2);
-                const view = new DataView(wavBuffer);
-                
-                const writeString = function(offset, string) {
-                    for (let i = 0; i < string.length; i++) {
-                        view.setUint8(offset + i, string.charCodeAt(i));
-                    }
-                };
-                
-                writeString(0, 'RIFF');
-                view.setUint32(4, 36 + length * numChannels * 2, true);
-                writeString(8, 'WAVE');
-                writeString(12, 'fmt ');
-                view.setUint32(16, 16, true);
-                view.setUint16(20, 1, true);
-                view.setUint16(22, numChannels, true);
-                view.setUint32(24, sampleRate, true);
-                view.setUint32(28, sampleRate * numChannels * 2, true);
-                view.setUint16(32, numChannels * 2, true);
-                view.setUint16(34, 16, true);
-                writeString(36, 'data');
-                view.setUint32(40, length * numChannels * 2, true);
-                
-                let offset = 44;
-                for (let i = 0; i < length; i++) {
-                    for (let channel = 0; channel < numChannels; channel++) {
-                        const sample = Math.max(-1, Math.min(1, buffer.getChannelData(channel)[i]));
-                        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-                        offset += 2;
-                    }
-                }
-                
-                return new Blob([wavBuffer], { type: 'audio/wav' });
-            }
-            
-            function updateProgress(current, total, message) {
-                const progress = (current / total) * 100;
-                progressBar.style.width = `${progress}%`;
-                progressText.textContent = message;
-            }
-            
-            function showStatus(message, type) {
-                statusDiv.textContent = message;
-                statusDiv.className = 'status';
-                
-                if (type === 'processing') {
-                    statusDiv.classList.add('status-processing');
-                } else if (type === 'ready') {
-                    statusDiv.classList.add('status-ready');
-                } else if (type === 'error') {
-                    statusDiv.classList.add('status-error');
-                }
-            }
-            
-            function showLoading(show) {
-                loadingDiv.style.display = show ? 'block' : 'none';
-                if (show) {
-                    progressBar.style.width = '0%';
-                    progressText.textContent = 'Procesando segmentos...';
-                }
-            }
-        });
-    </script>
+<div class="range-container">
+<label for="rateRange">Velocidad:</label>
+<input type="range" id="rateRange" min="0.5" max="2" value="0.8" step="0.1">
+<span id="rateValue">0.8x</span>
+</div>
+
+<div class="progress-container">
+<div id="progressBar"><div id="progress"></div></div>
+<span id="pauseCounter">Pausa: 0 / 0</span>
+</div>
+
+<div class="button-container">
+<button onclick="playAudio()">Reproducir</button>
+<button onclick="downloadAudio()">Descargar</button>
+</div>
+
+<script>
+let voices = [], audioChunks = [], recorder, audioCtx;
+const voiceSelect = document.getElementById("voiceSelect");
+const rateRange = document.getElementById("rateRange");
+const rateValue = document.getElementById("rateValue");
+const progress = document.getElementById("progress");
+const pauseCounter = document.getElementById("pauseCounter");
+
+// Mostrar valor de velocidad
+rateRange.addEventListener("input", () => { rateValue.textContent = rateRange.value + "x"; });
+
+// Cargar voces en español/latino
+function loadVoices() {
+    voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith("es"));
+    voiceSelect.innerHTML = "";
+    voices.forEach((voice, i) => {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = voice.name + ` (${voice.lang})`;
+        voiceSelect.appendChild(option);
+    });
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+
+// Función de reproducción
+function playAudio() {
+    const text = document.getElementById("textInput").value;
+    const pauseDuration = 5000;
+    const selectedVoice = voices[voiceSelect.value];
+    const rate = parseFloat(rateRange.value);
+    const parts = text.split("[PAUSA]");
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const dest = audioCtx.createMediaStreamDestination();
+    recorder = new MediaRecorder(dest.stream);
+    audioChunks = [];
+    recorder.ondataavailable = e => audioChunks.push(e.data);
+    recorder.start();
+
+    let index = 0;
+    pauseCounter.textContent = `Pausa: 0 / ${parts.length-1}`;
+
+    function speakPart() {
+        if (index >= parts.length) { setTimeout(() => recorder.stop(), 500); return; }
+        const utterance = new SpeechSynthesisUtterance(parts[index].trim());
+        utterance.voice = selectedVoice;
+        utterance.rate = rate;
+        utterance.onend = () => {
+            progress.style.width = `${((index+1)/parts.length)*100}%`;
+            pauseCounter.textContent = `Pausa: ${index} / ${parts.length-1}`;
+            if(index < parts.length-1) setTimeout(() => { index++; speakPart(); }, pauseDuration);
+            else index++;
+        };
+        speechSynthesis.speak(utterance);
+    }
+    speakPart();
+}
+
+// Función de descarga
+function downloadAudio() {
+    if(audioChunks.length === 0){ alert("Primero reproduce el audio para generar la grabación."); return; }
+    const blob = new Blob(audioChunks,{ type:'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download='audio.wav'; a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+
 </body>
 </html>
