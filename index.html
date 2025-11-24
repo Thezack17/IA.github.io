@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Audio con Pausas</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>">
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -274,6 +275,19 @@
             transition: width 0.3s;
         }
         
+        .github-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .github-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -297,7 +311,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Generador de Audio con Pausas</h1>
+        <h1>🎙️ Generador de Audio con Pausas</h1>
         
         <div class="description">
             <p>Escribe tu texto y añade pausas personalizadas usando <code>{{pause:3000}}</code> donde 3000 representa los milisegundos de pausa.</p>
@@ -311,6 +325,7 @@
             </div>
             <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
                 Necesitas una API Key de <a href="https://elevenlabs.io" target="_blank">ElevenLabs</a> para usar esta herramienta.
+                Tu API Key se guarda localmente en tu navegador y no se envía a ningún servidor.
             </p>
         </div>
         
@@ -380,6 +395,11 @@
         <div class="example">
             <h4>Ejemplo de uso:</h4>
             <p>Hola, este es un ejemplo.{{pause:1500}} Después de esta pausa de 1.5 segundos continuamos.{{pause:3000}} Y ahora una pausa de 3 segundos.</p>
+        </div>
+
+        <div class="github-info">
+            <h4>📝 Para usar en GitHub Pages:</h4>
+            <p>Esta página está optimizada para GitHub Pages. Solo guarda este archivo como <code>index.html</code> en tu repositorio y activa GitHub Pages en la configuración.</p>
         </div>
     </div>
 
